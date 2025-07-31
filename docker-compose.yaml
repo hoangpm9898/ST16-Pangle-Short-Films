@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb_server
+    ports:
+      - "27017:27017"
+    command: [ "mongod", "--bind_ip_all" ]
+    volumes:
+      - mongodb:/data/db
+
+volumes:
+  mongodb:
