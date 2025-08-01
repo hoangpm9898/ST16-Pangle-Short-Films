@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ShortFilm {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  shortplayId Int      @map("shortplay_id")
+  fileId      Int      @unique @map("file_id")
+  title       String
+  desc        String?
+  lang        String
+  voiceLang   String   @map("voice_lang")
+  total       Int
+  episodes    Episode[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("short_films")
+}
+
+model Episode {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  episodeId         String    @unique @map("episode_id")
+  index             Int
+  name              String
+  originStreamLink  String    @map("origin_stream_link")
+  hlsFileLink       String?   @map("hls_file_link")
+  shortFilmId       String    @db.ObjectId
+  shortFilm         ShortFilm @relation(fields: [shortFilmId], references: [id])
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("episodes")
+}
