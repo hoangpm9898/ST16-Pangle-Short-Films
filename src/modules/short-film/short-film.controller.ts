@@ -1,8 +1,6 @@
 import { Controller, Get, Param, Post, HttpCode, HttpStatus, Logger, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ShortFilmService, ShortFilm } from './short-film.service';
 
-@ApiTags('Short Films')
 @Controller('api/short-films')
 export class ShortFilmController {
 	private readonly logger = new Logger(ShortFilmController.name);

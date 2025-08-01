@@ -12,14 +12,14 @@ export class PangleService {
 	constructor(private readonly httpService: HttpService) {}
 
 	private generateSign(authInfo: any): string {
-		const secret = process.env.PANGLE_SECRET || 'default-secret';
+		const secret = config.PANGLE_SECRET;
 		return crypto.createHmac('sha256', secret).update(JSON.stringify(authInfo)).digest('hex');
 	}
 
 	private createAuthInfo(): any {
 		const authInfo = {
-			user_id: process.env.PANGLE_USER_ID || 'default-user',
-			role_id: process.env.PANGLE_ROLE_ID || 'default-role',
+			user_id: config.PANGLE_USER_ID,
+			role_id: config.PANGLE_ROLE_ID,
 			timestamp: Math.floor(Date.now() / 1000).toString(),
 		};
 		return {
@@ -78,12 +78,9 @@ export class PangleService {
 				if (response.code === '100' && response.data.length > 0) {
 					allShortFilms.push(...response.data);
 					this.logger.log(`Fetched page ${page}, total so far: ${allShortFilms.length}`);
-					if (response.page_info && response.page_info.total_page > page)
-						page++;
-					else
-						hasMorePages = false;
-				} else
-					hasMorePages = false;
+					if (response.page_info && response.page_info.total_page > page) page++;
+					else hasMorePages = false;
+				} else hasMorePages = false;
 			} catch (error) {
 				this.logger.error(`Error fetching page ${page}:`, error.message);
 				break;

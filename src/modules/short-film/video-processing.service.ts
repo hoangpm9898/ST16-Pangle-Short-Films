@@ -30,11 +30,7 @@ export class VideoProcessingService {
 			if (url.startsWith('file:///')) {
 				const localPath = url.replace('file:///', '');
 				this.logger.log(`Copying local file: ${localPath}`);
-				
-				// Ensure temp directory exists
 				await fs.mkdir(this.tempDir, { recursive: true });
-				
-				// Copy local file to temp directory
 				await fs.copyFile(localPath, filePath);
 				this.logger.log(`Local file copied successfully: ${filePath}`);
 				return filePath;
@@ -45,9 +41,7 @@ export class VideoProcessingService {
 					timeout: 300000,
 				}),
 			);
-			if (!response.data) {
-				throw new Error('No data received from URL');
-			}
+			if (!response.data) throw new Error('No data received from URL');
 			const writer = fsSync.createWriteStream(filePath);
 			let downloadedBytes = 0;
 			const totalBytes = parseInt(response.headers['content-length'] || '0', 10);

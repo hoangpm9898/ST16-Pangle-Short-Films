@@ -49,11 +49,7 @@ export class VideoQueueService {
 	async processVideoJob(jobData: VideoProcessingJob): Promise<void> {
 		try {
 			this.logger.log(`Processing video job for episode ${jobData.episodeId}`);
-			const fileName = this.videoProcessingService.generateFileName(
-				jobData.fileId,
-				jobData.episodeIndex,
-				0,
-			);
+			const fileName = this.videoProcessingService.generateFileName(jobData.fileId, jobData.episodeIndex, 0);
 			const localFilePath = await this.videoProcessingService.downloadVideoChunksWithRetry(
 				jobData.playUrl,
 				fileName,
@@ -69,22 +65,19 @@ export class VideoQueueService {
 			await this.videoProcessingService.cleanupTempFile(localFilePath);
 			await this.cleanupHLSFiles(hlsOutputPath);
 			if (!jobData.episodeId.includes('test') && !jobData.episodeId.includes('simple')) {
-			try {
-				await this.prisma.episode.update({
-					where: { episodeId: jobData.episodeId },
-					data: {
-						hlsFileLink,
-						updatedAt: new Date(),
-					},
-				});
-				this.logger.log(`Updated episode ${jobData.episodeId} in database with HLS link`);
-			} catch (error) {
-				this.logger.warn(`Failed to update episode ${jobData.episodeId} in database: ${error.message}`);
-			}
-		} else {
-			this.logger.log(`Skipping database update for test episode: ${jobData.episodeId}`);
-		}
-
+				try {
+					await this.prisma.episode.update({
+						where: { episodeId: jobData.episodeId },
+						data: {
+							hlsFileLink,
+							updatedAt: new Date(),
+						},
+					});
+					this.logger.log(`Updated episode ${jobData.episodeId} in database with HLS link`);
+				} catch (error) {
+					this.logger.warn(`Failed to update episode ${jobData.episodeId} in database: ${error.message}`);
+				}
+			} else this.logger.log(`Skipping database update for test episode: ${jobData.episodeId}`);
 			this.logger.log(`Successfully processed video for episode ${jobData.episodeId}`);
 		} catch (error) {
 			this.logger.error(`Error processing video job for episode ${jobData.episodeId}:`, error.message);

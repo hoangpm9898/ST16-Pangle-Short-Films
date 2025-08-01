@@ -40,8 +40,7 @@ export class ShortFilmService {
 		this.logger.log('Starting scheduled sync of short films');
 		try {
 			const shortFilms = await this.pangleService.fetchAllShortFilms();
-			for (const film of shortFilms)
-				await this.processShortFilm(film);
+			for (const film of shortFilms) await this.processShortFilm(film);
 			this.logger.log(`Sync completed. Processed ${shortFilms.length} short films`);
 		} catch (error) {
 			this.logger.error('Error during scheduled sync:', error.message);
